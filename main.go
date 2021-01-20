@@ -12,19 +12,24 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kanhaiya15/go-fast-cache/store"
 	"github.com/kanhaiya15/go-fast-cache/types"
-	cache "github.com/patrickmn/go-cache"
+	"github.com/patrickmn/go-cache"
 )
+
+var (
+	newCache *cache.Cache
+)
+
+func init() {
+	newCache = store.Setup()
+}
 
 func main() {
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "GoLang", "status": http.StatusOK})
 	})
-
-	// Create a cache with a default expiration time of 5 minutes, and which
-	// purges expired items every 1 minutes
-	ch := cache.New(10*time.Minute, 1*time.Second)
 
 	router.POST("/post", func(c *gin.Context) {
 		var json types.Entity
@@ -33,12 +38,12 @@ func main() {
 			return
 		}
 
-		ch.Set(fmt.Sprint(json.ID), &json, cache.DefaultExpiration)
+		newCache.Set(fmt.Sprint(json.ID), &json, cache.DefaultExpiration)
 		c.JSON(http.StatusOK, gin.H{"message": "OK", "status": http.StatusOK})
 	})
 
 	router.GET("/post/:id", func(c *gin.Context) {
-		if x, ok := ch.Get(fmt.Sprint(c.Param("id"))); ok {
+		if x, ok := newCache.Get(fmt.Sprint(c.Param("id"))); ok {
 			entity := x.(*types.Entity)
 			c.JSON(http.StatusOK, gin.H{
 				"message": "OK",
