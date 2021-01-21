@@ -16,6 +16,8 @@ export CACHE_PURGE_IN_MINUTE=5
 ## Steps
 ```
 1. Clone repository
-2. Run Command :  go run main.go
+2. Goto repo directory
+3. Run Command : go get
+4. Run Command :  go run main.go
 ```
 - Note: You can change environment variables as per your requirements.
